@@ -13,6 +13,9 @@
   
   <!-- Three.js Library via CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  
+  <!-- Google Identity Services Library -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 
   <style>
     /* ==========================================================================
@@ -35,9 +38,11 @@
       --accent-glow: rgba(0, 240, 255, 0.25);
       --optical-grid: rgba(0, 240, 255, 0.04);
       --shadow-glass: 0 20px 50px rgba(0, 0, 0, 0.6);
+      
       --font-heading: 'Cinzel', serif;
       --font-body: 'Inter', sans-serif;
       --font-mono: 'JetBrains Mono', monospace;
+      
       --transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     }
 
@@ -121,9 +126,8 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background-image: 
-        linear-gradient(to right, var(--optical-grid) 1px, transparent 1px),
-        linear-gradient(to bottom, var(--optical-grid) 1px, transparent 1px);
+      background-image: linear-gradient(to right, var(--optical-grid) 1px, transparent 1px),
+                        linear-gradient(to bottom, var(--optical-grid) 1px, transparent 1px);
       background-size: 60px 60px;
       z-index: 1;
       pointer-events: none;
@@ -145,7 +149,6 @@
       align-items: center;
       justify-content: center;
     }
-
     #optical-cursor::after {
       content: '';
       width: 4px;
@@ -154,14 +157,12 @@
       border-radius: 50%;
       box-shadow: 0 0 8px var(--accent-optical);
     }
-
     #optical-cursor.hovering {
       width: 50px;
       height: 50px;
       border-color: var(--accent-gold);
       background: rgba(0, 240, 255, 0.05);
     }
-
     #optical-cursor.inspecting {
       width: 65px;
       height: 65px;
@@ -190,12 +191,10 @@
       overflow: hidden;
       transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
     }
-
     .glass-card:hover {
       border-color: var(--border-highlight);
       box-shadow: 0 25px 60px var(--accent-glow);
     }
-
     .glass-card::before {
       content: '';
       position: absolute;
@@ -206,7 +205,6 @@
       background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
       transition: left 0.7s ease;
     }
-
     .glass-card:hover::before {
       left: 100%;
     }
@@ -232,19 +230,16 @@
       transition: all 0.3s var(--transition-smooth);
       text-decoration: none;
     }
-
     .btn-optical:hover {
       background: var(--accent-optical);
       color: #000;
       box-shadow: 0 0 25px var(--accent-glow);
       transform: translateY(-2px);
     }
-
     .btn-secondary {
       background: rgba(255, 255, 255, 0.05);
       border-color: var(--border-glass);
     }
-
     .btn-secondary:hover {
       background: rgba(255, 255, 255, 0.2);
       color: var(--text-bright);
@@ -265,21 +260,18 @@
       background: linear-gradient(to bottom, var(--bg-primary), transparent);
       transition: padding 0.3s, background 0.3s;
     }
-
     header.scrolled {
       padding: 12px 40px;
       background: var(--bg-glass-solid);
       backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--border-glass);
     }
-
     .brand-container {
       display: flex;
       align-items: center;
       gap: 14px;
       cursor: pointer;
     }
-
     .brand-logo-ring {
       width: 38px;
       height: 38px;
@@ -291,19 +283,16 @@
       position: relative;
       animation: pulseRing 4s infinite ease-in-out;
     }
-
     @keyframes pulseRing {
       0%, 100% { box-shadow: 0 0 5px var(--accent-glow); transform: scale(1); }
       50% { box-shadow: 0 0 18px var(--accent-glow); transform: scale(1.05); }
     }
-
     .brand-logo-ring img {
       width: 24px;
       height: 24px;
       border-radius: 50%;
       object-fit: cover;
     }
-
     .brand-title {
       font-family: var(--font-heading);
       font-size: 1.4rem;
@@ -311,7 +300,6 @@
       letter-spacing: 4px;
       color: var(--text-bright);
     }
-
     .brand-subtitle {
       font-family: var(--font-mono);
       font-size: 0.6rem;
@@ -319,13 +307,11 @@
       color: var(--accent-optical);
       text-transform: uppercase;
     }
-
     nav {
       display: flex;
       align-items: center;
       gap: 28px;
     }
-
     .nav-link {
       color: var(--text-muted);
       text-decoration: none;
@@ -336,11 +322,9 @@
       transition: color 0.3s;
       position: relative;
     }
-
     .nav-link:hover, .nav-link.active {
       color: var(--accent-optical);
     }
-
     .nav-link::after {
       content: '';
       position: absolute;
@@ -351,17 +335,14 @@
       background: var(--accent-optical);
       transition: width 0.3s;
     }
-
     .nav-link:hover::after, .nav-link.active::after {
       width: 100%;
     }
-
     .nav-controls {
       display: flex;
       align-items: center;
       gap: 12px;
     }
-
     .icon-btn {
       width: 36px;
       height: 36px;
@@ -375,7 +356,6 @@
       cursor: pointer;
       transition: all 0.3s;
     }
-
     .icon-btn:hover {
       background: var(--accent-optical);
       color: #000;
@@ -394,13 +374,11 @@
       justify-content: center;
       transition: opacity 1s ease, visibility 1s ease;
     }
-
     #intro-overlay.hidden {
       opacity: 0;
       visibility: hidden;
       pointer-events: none;
     }
-
     .intro-canvas-box {
       position: relative;
       width: 280px;
@@ -409,14 +387,12 @@
       align-items: center;
       justify-content: center;
     }
-
     .intro-ring {
       position: absolute;
       border-radius: 50%;
       border: 1px solid rgba(0, 240, 255, 0.3);
       animation: introSpin 12s linear infinite;
     }
-
     .intro-ring-1 { width: 260px; height: 260px; border-style: dashed; }
     .intro-ring-2 { width: 190px; height: 190px; border-color: var(--accent-gold); animation-direction: reverse; animation-duration: 8s; }
     .intro-ring-3 { width: 120px; height: 120px; border-width: 2px; }
@@ -425,12 +401,10 @@
       from { transform: rotate(0deg); }
       to { transform: rotate(360deg); }
     }
-
     .intro-text-box {
       margin-top: 30px;
       text-align: center;
     }
-
     .intro-title {
       font-family: var(--font-heading);
       font-size: 2.2rem;
@@ -438,7 +412,6 @@
       margin-bottom: 8px;
       color: #ffffff;
     }
-
     .intro-tagline {
       font-family: var(--font-mono);
       font-size: 0.8rem;
@@ -446,7 +419,6 @@
       color: var(--accent-optical);
       text-transform: uppercase;
     }
-
     .intro-progress-bar {
       width: 200px;
       height: 2px;
@@ -455,7 +427,6 @@
       position: relative;
       overflow: hidden;
     }
-
     .intro-progress-fill {
       position: absolute;
       top: 0;
@@ -466,7 +437,6 @@
       box-shadow: 0 0 10px var(--accent-optical);
       transition: width 0.1s linear;
     }
-
     .skip-intro-btn {
       position: absolute;
       bottom: 40px;
@@ -481,7 +451,6 @@
       cursor: pointer;
       transition: all 0.3s;
     }
-
     .skip-intro-btn:hover {
       color: var(--text-bright);
       border-color: var(--accent-optical);
@@ -493,7 +462,6 @@
       z-index: 2;
       width: 100%;
     }
-
     section {
       min-height: 100vh;
       padding: 120px 8% 80px 8%;
@@ -502,11 +470,9 @@
       justify-content: center;
       position: relative;
     }
-
     .section-header {
       margin-bottom: 50px;
     }
-
     .section-tag {
       font-family: var(--font-mono);
       font-size: 0.8rem;
@@ -518,14 +484,12 @@
       align-items: center;
       gap: 10px;
     }
-
     .section-tag::before {
       content: '';
       width: 12px;
       height: 2px;
       background: var(--accent-optical);
     }
-
     .section-title {
       font-family: var(--font-heading);
       font-size: clamp(2rem, 4vw, 3.2rem);
@@ -534,7 +498,6 @@
       color: var(--text-bright);
       line-height: 1.2;
     }
-
     .section-desc {
       font-size: 1rem;
       color: var(--text-muted);
@@ -552,11 +515,9 @@
       gap: 40px;
       padding-top: 140px;
     }
-
     .hero-content {
       z-index: 5;
     }
-
     .hero-badge {
       display: inline-flex;
       align-items: center;
@@ -571,7 +532,6 @@
       letter-spacing: 2px;
       margin-bottom: 24px;
     }
-
     .hero-title {
       font-family: var(--font-heading);
       font-size: clamp(2.8rem, 5vw, 4.5rem);
@@ -581,20 +541,17 @@
       color: var(--text-bright);
       margin-bottom: 20px;
     }
-
     .hero-title span {
       background: linear-gradient(135deg, var(--text-bright), var(--accent-optical));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
-
     .hero-actions {
       display: flex;
       gap: 18px;
       margin-top: 36px;
       flex-wrap: wrap;
     }
-
     .hero-visual-viewport {
       position: relative;
       width: 100%;
@@ -603,7 +560,6 @@
       align-items: center;
       justify-content: center;
     }
-
     .hero-lens-interactive {
       width: 380px;
       height: 380px;
@@ -618,18 +574,15 @@
       cursor: pointer;
       transition: transform 0.1s ease-out;
     }
-
     .hero-iris-ring {
       position: absolute;
       border-radius: 50%;
       border: 1px dashed var(--accent-optical);
       animation: rotateLens 20s linear infinite;
     }
-
     .hero-iris-ring-1 { width: 340px; height: 340px; }
     .hero-iris-ring-2 { width: 260px; height: 260px; border-style: solid; border-color: rgba(245, 158, 11, 0.5); animation-direction: reverse; }
     .hero-iris-ring-3 { width: 180px; height: 180px; border-width: 2px; }
-
     .hero-lens-core {
       width: 100px;
       height: 100px;
@@ -657,14 +610,12 @@
       gap: 30px;
       margin-top: 20px;
     }
-
     .lab-viewport-container {
       height: 520px;
       position: relative;
       display: flex;
       flex-direction: column;
     }
-
     .lab-canvas-box {
       flex: 1;
       width: 100%;
@@ -673,12 +624,10 @@
       border-radius: 8px;
       overflow: hidden;
     }
-
     #slitlamp-canvas {
       width: 100%;
       height: 100%;
     }
-
     .lab-controls-bar {
       display: flex;
       align-items: center;
@@ -689,19 +638,16 @@
       gap: 15px;
       flex-wrap: wrap;
     }
-
     .control-group {
       display: flex;
       align-items: center;
       gap: 10px;
     }
-
     .control-label {
       font-family: var(--font-mono);
       font-size: 0.75rem;
       color: var(--text-muted);
     }
-
     .range-slider {
       -webkit-appearance: none;
       appearance: none;
@@ -711,7 +657,6 @@
       background: var(--border-glass);
       outline: none;
     }
-
     .range-slider::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
@@ -722,19 +667,16 @@
       cursor: pointer;
       box-shadow: 0 0 8px var(--accent-optical);
     }
-
     .lab-info-panel {
       padding: 24px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
     }
-
     .component-list {
       list-style: none;
       margin-top: 16px;
     }
-
     .component-item {
       padding: 10px 14px;
       margin-bottom: 8px;
@@ -749,20 +691,17 @@
       align-items: center;
       justify-content: space-between;
     }
-
     .component-item:hover, .component-item.active {
       background: rgba(0, 240, 255, 0.08);
       border-color: var(--accent-optical);
       color: var(--accent-optical);
     }
-
     .component-item .dot {
       width: 6px;
       height: 6px;
       border-radius: 50%;
       background: var(--text-muted);
     }
-
     .component-item.active .dot {
       background: var(--accent-optical);
       box-shadow: 0 0 8px var(--accent-optical);
@@ -775,12 +714,10 @@
       gap: 30px;
       margin-top: 20px;
     }
-
     .interactive-canvas-card {
       height: 440px;
       position: relative;
     }
-
     .canvas-overlay-hud {
       position: absolute;
       top: 16px;
@@ -804,7 +741,6 @@
       flex-wrap: wrap;
       gap: 15px;
     }
-
     .view-mode-toggles {
       display: flex;
       gap: 8px;
@@ -813,7 +749,6 @@
       border-radius: 6px;
       border: 1px solid var(--border-glass);
     }
-
     .view-btn {
       padding: 6px 14px;
       border: none;
@@ -825,24 +760,20 @@
       cursor: pointer;
       transition: all 0.2s;
     }
-
     .view-btn.active {
       background: var(--accent-optical);
       color: #000;
       font-weight: bold;
     }
-
     .products-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 24px;
       transition: all 0.4s ease;
     }
-
     .products-grid.cinematic-view {
       grid-template-columns: 1fr;
     }
-
     .product-card {
       padding: 20px;
       display: flex;
@@ -850,7 +781,6 @@
       justify-content: space-between;
       min-height: 380px;
     }
-
     .cinematic-view .product-card {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -858,7 +788,6 @@
       gap: 30px;
       min-height: 320px;
     }
-
     .product-img-box {
       width: 100%;
       height: 200px;
@@ -870,40 +799,33 @@
       border-radius: 8px;
       background: rgba(0,0,0,0.3);
     }
-
     .cinematic-view .product-img-box {
       height: 280px;
     }
-
     .product-img-box img {
       max-width: 90%;
       max-height: 90%;
       object-fit: contain;
       transition: transform 0.5s var(--transition-smooth);
     }
-
     .product-card:hover .product-img-box img {
       transform: scale(1.08);
     }
-
     .product-info {
       margin-top: 16px;
     }
-
     .product-code {
       font-family: var(--font-mono);
       font-size: 0.75rem;
       color: var(--accent-optical);
       letter-spacing: 2px;
     }
-
     .product-name {
       font-family: var(--font-heading);
       font-size: 1.2rem;
       color: var(--text-bright);
       margin: 6px 0 10px 0;
     }
-
     .product-actions {
       display: flex;
       gap: 10px;
@@ -927,7 +849,6 @@
       border-radius: 40px;
       box-shadow: var(--shadow-glass);
     }
-
     .hud-metric {
       display: flex;
       align-items: center;
@@ -936,12 +857,10 @@
       font-size: 0.7rem;
       color: var(--text-muted);
     }
-
     .hud-metric span {
       color: var(--accent-optical);
       font-weight: bold;
     }
-
     .hud-divider {
       width: 1px;
       height: 16px;
@@ -955,19 +874,16 @@
       gap: 40px;
       margin-top: 30px;
     }
-
     .contact-info-box {
       display: flex;
       flex-direction: column;
       gap: 20px;
     }
-
     .contact-detail-item {
       display: flex;
       align-items: flex-start;
       gap: 16px;
     }
-
     .contact-icon {
       width: 40px;
       height: 40px;
@@ -980,7 +896,6 @@
       color: var(--accent-optical);
       flex-shrink: 0;
     }
-
     .status-badge {
       display: inline-flex;
       align-items: center;
@@ -991,26 +906,28 @@
       font-size: 0.75rem;
       font-weight: bold;
     }
-
     .status-open {
       background: rgba(34, 197, 94, 0.15);
       color: #22c55e;
       border: 1px solid rgba(34, 197, 94, 0.4);
     }
-
     .status-closed {
       background: rgba(239, 68, 68, 0.15);
       color: #ef4444;
       border: 1px solid rgba(239, 68, 68, 0.4);
     }
-
     .status-dot {
       width: 8px;
       height: 8px;
       border-radius: 50%;
     }
-    .status-open .status-dot { background: #22c55e; box-shadow: 0 0 8px #22c55e; }
-    .status-closed .status-dot { background: #ef4444; }
+    .status-open .status-dot {
+      background: #22c55e;
+      box-shadow: 0 0 8px #22c55e;
+    }
+    .status-closed .status-dot {
+      background: #ef4444;
+    }
 
     footer {
       padding: 40px 8%;
@@ -1025,7 +942,6 @@
       z-index: 10;
       background: var(--bg-primary);
     }
-
     .developer-credit {
       color: var(--accent-optical);
       letter-spacing: 2px;
@@ -1048,19 +964,16 @@
       transition: all 0.3s ease;
       padding: 20px;
     }
-
     .modal-overlay.active {
       opacity: 1;
       visibility: visible;
     }
-
     .modal-container {
       width: 100%;
       max-width: 600px;
       padding: 30px;
       position: relative;
     }
-
     .modal-close {
       position: absolute;
       top: 20px;
@@ -1072,21 +985,40 @@
       cursor: pointer;
       transition: color 0.2s;
     }
-
     .modal-close:hover {
       color: var(--accent-optical);
     }
 
     /* Mobile Responsive Adjustments */
     @media (max-width: 992px) {
-      #hero { grid-template-columns: 1fr; padding-top: 100px; text-align: center; }
-      .hero-actions { justify-content: center; }
-      .lab-grid, .eye-lab-grid, .contact-grid { grid-template-columns: 1fr; }
-      header { padding: 15px 20px; }
-      nav { display: none; } /* Simplified mobile header */
-      section { padding: 80px 5% 60px 5%; }
-      #hud-persistent-bar { width: 90%; justify-content: space-around; padding: 8px 12px; }
-      .hud-metric:nth-child(even) { display: none; }
+      #hero {
+        grid-template-columns: 1fr;
+        padding-top: 100px;
+        text-align: center;
+      }
+      .hero-actions {
+        justify-content: center;
+      }
+      .lab-grid, .eye-lab-grid, .contact-grid {
+        grid-template-columns: 1fr;
+      }
+      header {
+        padding: 15px 20px;
+      }
+      nav {
+        display: none;
+      } /* Simplified mobile header */
+      section {
+        padding: 80px 5% 60px 5%;
+      }
+      #hud-persistent-bar {
+        width: 90%;
+        justify-content: space-around;
+        padding: 8px 12px;
+      }
+      .hud-metric:nth-child(even) {
+        display: none;
+      }
     }
   </style>
 </head>
@@ -1168,7 +1100,6 @@
 
   <!-- Main Content -->
   <main>
-
     <!-- 01 — HERO SECTION -->
     <section id="hero">
       <div class="hero-content">
@@ -1289,11 +1220,9 @@
             <h3 style="font-family:var(--font-heading); color:var(--text-bright);">LIGHT → VISION PATHWAY</h3>
             <p style="font-size:0.8rem; color:var(--text-muted); margin-top:6px;">Sequence: Light Ray → Cornea → Pupil → Lens → Retina → Optic Nerve → Brain</p>
           </div>
-
           <div style="height:200px; width:100%; position:relative;">
             <canvas id="light-path-canvas" style="width:100%; height:100%;"></canvas>
           </div>
-
           <div style="display:flex; align-items:center; justify-content:space-between; border-top:1px solid var(--border-glass); padding-top:12px;">
             <div style="display:flex; gap:8px;">
               <button class="btn-optical" id="play-light-sim" style="padding:6px 14px; font-size:0.75rem;">PLAY</button>
@@ -1341,7 +1270,6 @@
       <div class="contact-grid">
         <div class="glass-card" style="padding:30px;">
           <h3 style="font-family:var(--font-heading); font-size:1.4rem; color:var(--text-bright); margin-bottom:20px;">HEADQUARTERS & CLINICAL SHOWROOM</h3>
-          
           <div class="contact-info-box">
             <div class="contact-detail-item">
               <div class="contact-icon">📍</div>
@@ -1405,7 +1333,6 @@
         </div>
       </div>
     </section>
-
   </main>
 
   <!-- Persistent Technical HUD Bar -->
@@ -1421,18 +1348,24 @@
     <div class="hud-metric">STATUS: <span style="color:#22c55e;">READY</span></div>
   </div>
 
-  <!-- Sign In / Auth Modal -->
+  <!-- Sign In / Auth Modal with Official Google Verification -->
   <div class="modal-overlay" id="auth-modal">
     <div class="glass-card modal-container">
       <button class="modal-close" onclick="closeAuthModal()">✕</button>
       <h3 style="font-family:var(--font-heading); font-size:1.5rem; color:var(--text-bright); margin-bottom:8px;">ACCOUNT ACCESS</h3>
       <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:24px;">Sign in to save your custom visual preferences and laboratory setups.</p>
       
-      <div style="display:flex; flex-direction:column; gap:14px;">
-        <button class="btn-optical" style="background:#fff; color:#000; border-color:#fff;" onclick="alert('Google Authentication setup requires OAuth configuration.')">
+      <div style="display:flex; flex-direction:column; gap:14px;" id="auth-modal-content">
+        <!-- Google Verification Button -->
+        <button class="btn-optical" id="google-signin-btn" style="background:#fff; color:#000; border-color:#fff;">
           <svg width="18" height="18" viewBox="0 0 24 24" style="margin-right:8px;"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
           CONTINUE WITH GOOGLE
         </button>
+        
+        <!-- Official GIS Button Render Anchor (fallback/standard integration) -->
+        <div id="google-gis-button-wrapper" style="display:none; width:100%; justify-content:center;"></div>
+        <div id="auth-status-msg" style="display:none; font-family:var(--font-mono); font-size:0.75rem; color:var(--accent-gold); text-align:center; padding:6px 0;"></div>
+
         <button class="btn-optical btn-secondary" onclick="closeAuthModal()">
           CONTINUE AS GUEST
         </button>
@@ -1629,7 +1562,6 @@
       // Parallax effect from cursor
       bgCamera.position.x += ((mouseX / window.innerWidth - 0.5) * 2 - bgCamera.position.x) * 0.05;
       bgCamera.position.y += (-(mouseY / window.innerHeight - 0.5) * 2 - bgCamera.position.y) * 0.05;
-
       bgRenderer.render(bgScene, bgCamera);
 
       // Slit Lamp rotation
@@ -1648,7 +1580,6 @@
         lastTime = now;
       }
     }
-
     animate();
 
     window.addEventListener('resize', () => {
@@ -1729,7 +1660,6 @@
         ctx.arc(cx, cy, 35, 0, Math.PI * 2);
         ctx.fillStyle = 'rgba(0, 240, 255, 0.1)';
         ctx.fill();
-        ctx.strokeStyle = '#00f0ff';
         ctx.stroke();
       }
       drawEyeAnatomy();
@@ -1778,7 +1708,6 @@
 
         requestAnimationFrame(renderLightSim);
       }
-
       renderLightSim();
 
       document.getElementById('play-light-sim')?.addEventListener('click', () => simRunning = true);
@@ -1789,7 +1718,6 @@
        J. PRODUCT ARCHIVE ENGINE (10 PRODUCTS)
        -------------------------------------------------------------------------- */
     const productsContainer = document.getElementById('products-container');
-
     const products = Array.from({ length: 10 }, (_, i) => ({
       id: i + 1,
       code: `PRODUCT 0${i + 1}`,
@@ -1800,7 +1728,6 @@
     function renderProducts(isCinematic = false) {
       if (!productsContainer) return;
       productsContainer.className = `products-grid ${isCinematic ? 'cinematic-view' : ''}`;
-      
       productsContainer.innerHTML = products.map(p => `
         <div class="glass-card product-card">
           <div class="product-img-box">
@@ -1819,7 +1746,6 @@
         </div>
       `).join('');
     }
-
     renderProducts(false);
 
     document.getElementById('view-grid-btn')?.addEventListener('click', function() {
@@ -1835,15 +1761,130 @@
     });
 
     /* --------------------------------------------------------------------------
-       K. AUTH MODAL ENGINE
+       K. AUTH MODAL ENGINE & GOOGLE IDENTITY SERVICES INTEGRATION
        -------------------------------------------------------------------------- */
+    const GOOGLE_CLIENT_ID = "467701245269-lbjmcnmoaj7crmqaeqjiffk7pntnarb7.apps.googleusercontent.com";
     const authBtn = document.getElementById('auth-btn');
     const authModal = document.getElementById('auth-modal');
 
     authBtn?.addEventListener('click', () => authModal?.classList.add('active'));
+
     window.closeAuthModal = function() {
       authModal?.classList.remove('active');
     };
+
+    // Helper function to decode JWT token payload cleanly without external libraries
+    function parseJwt(token) {
+      try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        return JSON.parse(jsonPayload);
+      } catch (e) {
+        return null;
+      }
+    }
+
+    // Handles Google OAuth Credential Callback
+    window.handleGoogleCredentialResponse = function(response) {
+      if (response && response.credential) {
+        const payload = parseJwt(response.credential);
+        if (payload) {
+          const userName = payload.name || payload.email || 'Verified User';
+          displayAuthenticatedState(userName);
+        }
+      }
+    };
+
+    function displayAuthenticatedState(userName) {
+      const container = document.getElementById('auth-modal-content');
+      const authBtnLabel = document.querySelector('#auth-btn span');
+      if (authBtnLabel) {
+        authBtnLabel.innerText = userName.split(' ')[0].toUpperCase();
+      }
+      if (container) {
+        container.innerHTML = `
+          <div style="text-align:center; padding: 16px 0;">
+            <div style="font-family:var(--font-mono); font-size:0.75rem; color:var(--accent-optical); letter-spacing:2px; margin-bottom:8px;">GOOGLE VERIFIED</div>
+            <div style="font-family:var(--font-heading); font-size:1.3rem; color:var(--text-bright); font-weight:bold;">${userName}</div>
+          </div>
+          <button class="btn-optical btn-secondary" onclick="closeAuthModal()" style="margin-top:10px; justify-content:center;">
+            CONTINUE TO SYSTEM
+          </button>
+        `;
+      }
+    }
+
+    function initGoogleAuth() {
+      const googleBtn = document.getElementById('google-signin-btn');
+      const statusMsg = document.getElementById('auth-status-msg');
+      const gisWrapper = document.getElementById('google-gis-button-wrapper');
+
+      if (window.google && google.accounts && google.accounts.id) {
+        try {
+          google.accounts.id.initialize({
+            client_id: GOOGLE_CLIENT_ID,
+            callback: handleGoogleCredentialResponse,
+            auto_select: false,
+            context: 'signin'
+          });
+
+          // Render official GIS standard button into wrapper for fallback or direct click
+          if (gisWrapper) {
+            google.accounts.id.renderButton(gisWrapper, {
+              theme: 'outline',
+              size: 'large',
+              width: 280,
+              text: 'continue_with'
+            });
+          }
+
+          if (googleBtn) {
+            googleBtn.addEventListener('click', () => {
+              google.accounts.id.prompt((notification) => {
+                if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+                  // Fallback to displaying Google official standard GIS element if popup/one-tap prompt is blocked or origin restricted
+                  if (gisWrapper) {
+                    gisWrapper.style.display = 'flex';
+                    googleBtn.style.display = 'none';
+                  }
+                  if (statusMsg) {
+                    statusMsg.style.display = 'block';
+                    statusMsg.innerHTML = 'GOOGLE VERIFICATION<br><span style="color:var(--text-muted); font-size:0.7rem;">Select account via Google Prompt below or continue as Guest.</span>';
+                  }
+                }
+              });
+            });
+          }
+        } catch (err) {
+          showAuthFallback();
+        }
+      } else {
+        // Retry initialization once if script is loading asynchronously
+        setTimeout(() => {
+          if (window.google && google.accounts && google.accounts.id) {
+            initGoogleAuth();
+          } else if (googleBtn) {
+            googleBtn.addEventListener('click', showAuthFallback);
+          }
+        }, 1000);
+      }
+    }
+
+    function showAuthFallback() {
+      const statusMsg = document.getElementById('auth-status-msg');
+      if (statusMsg) {
+        statusMsg.style.display = 'block';
+        statusMsg.innerHTML = `
+          <strong style="color:var(--accent-gold);">GOOGLE VERIFICATION</strong><br>
+          <span style="color:var(--text-muted); font-size:0.7rem;">Authentication is currently unavailable in this static environment.</span>
+        `;
+      }
+    }
+
+    window.addEventListener('load', initGoogleAuth);
 
     /* --------------------------------------------------------------------------
        L. ASIA/KOLKATA TIME & LIVE STATUS ENGINE
@@ -1875,7 +1916,6 @@
         }
       }
     }
-
     updateLiveStatus();
     setInterval(updateLiveStatus, 60000);
 
