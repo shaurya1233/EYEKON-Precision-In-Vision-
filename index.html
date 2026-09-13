@@ -1,0 +1,1895 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="obsidian" data-mode="cinematic">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>EYEKON — Precision in Vision | 6D Optical Experience Engine</title>
+  <meta name="description" content="EYEKON - Extreme 6D Digital Optical Vision Laboratory & Ophthalmic Instrumentation Experience. Precision in Vision.">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+  
+  <!-- Three.js Library via CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <style>
+    /* ==========================================================================
+       01 — ENGINE CORE CSS & DESIGN TOKENS
+       ========================================================================== */
+    :root {
+      /* Obsidian Theme (Default) */
+      --bg-primary: #030508;
+      --bg-secondary: #090d14;
+      --bg-glass: rgba(10, 16, 26, 0.65);
+      --bg-glass-solid: rgba(15, 23, 38, 0.85);
+      --border-glass: rgba(255, 255, 255, 0.12);
+      --border-highlight: rgba(0, 240, 255, 0.4);
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-bright: #ffffff;
+      --accent-optical: #00f0ff;
+      --accent-blue: #3b82f6;
+      --accent-gold: #f59e0b;
+      --accent-glow: rgba(0, 240, 255, 0.25);
+      --optical-grid: rgba(0, 240, 255, 0.04);
+      --shadow-glass: 0 20px 50px rgba(0, 0, 0, 0.6);
+      --font-heading: 'Cinzel', serif;
+      --font-body: 'Inter', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    [data-theme="clinical-light"] {
+      --bg-primary: #f8fafc;
+      --bg-secondary: #f1f5f9;
+      --bg-glass: rgba(255, 255, 255, 0.75);
+      --bg-glass-solid: rgba(255, 255, 255, 0.92);
+      --border-glass: rgba(15, 23, 42, 0.12);
+      --border-highlight: rgba(2, 132, 199, 0.5);
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --text-bright: #020617;
+      --accent-optical: #0284c7;
+      --accent-blue: #2563eb;
+      --accent-gold: #d97706;
+      --accent-glow: rgba(2, 132, 199, 0.18);
+      --optical-grid: rgba(15, 23, 42, 0.03);
+      --shadow-glass: 0 15px 35px rgba(15, 23, 42, 0.08);
+    }
+
+    [data-mode="minimal"] .hud-panel,
+    [data-mode="minimal"] .grid-lines,
+    [data-mode="minimal"] .bg-particles-canvas {
+      opacity: 0.15 !important;
+    }
+
+    [data-mode="technical"] {
+      --font-body: 'JetBrains Mono', monospace;
+    }
+
+    /* Reset & Base Setup */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+      transition: background-color 0.5s ease, color 0.5s ease;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-primary);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-glass);
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent-optical);
+    }
+
+    /* Background 4D Environment Canvas */
+    #bg-webgl-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .optical-grid-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-image: 
+        linear-gradient(to right, var(--optical-grid) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--optical-grid) 1px, transparent 1px);
+      background-size: 60px 60px;
+      z-index: 1;
+      pointer-events: none;
+      opacity: 0.8;
+    }
+
+    /* Optical Custom Cursor */
+    #optical-cursor {
+      position: fixed;
+      width: 30px;
+      height: 30px;
+      border: 1px solid var(--accent-optical);
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      z-index: 9999;
+      transition: width 0.2s, height 0.2s, border-color 0.2s, transform 0.05s linear;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #optical-cursor::after {
+      content: '';
+      width: 4px;
+      height: 4px;
+      background: var(--accent-optical);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent-optical);
+    }
+
+    #optical-cursor.hovering {
+      width: 50px;
+      height: 50px;
+      border-color: var(--accent-gold);
+      background: rgba(0, 240, 255, 0.05);
+    }
+
+    #optical-cursor.inspecting {
+      width: 65px;
+      height: 65px;
+      border-style: dashed;
+      animation: rotateCursor 10s linear infinite;
+    }
+
+    @keyframes rotateCursor {
+      from { transform: translate(-50%, -50%) rotate(0deg); }
+      to { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    @media (hover: none) and (pointer: coarse) {
+      #optical-cursor { display: none !important; }
+    }
+
+    /* Base Glass Utility */
+    .glass-card {
+      background: var(--bg-glass);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border-glass);
+      border-radius: 12px;
+      box-shadow: var(--shadow-glass);
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+    }
+
+    .glass-card:hover {
+      border-color: var(--border-highlight);
+      box-shadow: 0 25px 60px var(--accent-glow);
+    }
+
+    .glass-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+      transition: left 0.7s ease;
+    }
+
+    .glass-card:hover::before {
+      left: 100%;
+    }
+
+    /* Buttons */
+    .btn-optical {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px 26px;
+      background: rgba(0, 240, 255, 0.08);
+      border: 1px solid var(--border-highlight);
+      color: var(--text-bright);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      border-radius: 6px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s var(--transition-smooth);
+      text-decoration: none;
+    }
+
+    .btn-optical:hover {
+      background: var(--accent-optical);
+      color: #000;
+      box-shadow: 0 0 25px var(--accent-glow);
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: var(--border-glass);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.2);
+      color: var(--text-bright);
+      border-color: var(--text-bright);
+    }
+
+    /* Header & Navigation */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+      padding: 18px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(to bottom, var(--bg-primary), transparent);
+      transition: padding 0.3s, background 0.3s;
+    }
+
+    header.scrolled {
+      padding: 12px 40px;
+      background: var(--bg-glass-solid);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-glass);
+    }
+
+    .brand-container {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+    }
+
+    .brand-logo-ring {
+      width: 38px;
+      height: 38px;
+      border: 2px solid var(--accent-optical);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      animation: pulseRing 4s infinite ease-in-out;
+    }
+
+    @keyframes pulseRing {
+      0%, 100% { box-shadow: 0 0 5px var(--accent-glow); transform: scale(1); }
+      50% { box-shadow: 0 0 18px var(--accent-glow); transform: scale(1.05); }
+    }
+
+    .brand-logo-ring img {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .brand-title {
+      font-family: var(--font-heading);
+      font-size: 1.4rem;
+      font-weight: 900;
+      letter-spacing: 4px;
+      color: var(--text-bright);
+    }
+
+    .brand-subtitle {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 2px;
+      color: var(--accent-optical);
+      text-transform: uppercase;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .nav-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      transition: color 0.3s;
+      position: relative;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      color: var(--accent-optical);
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--accent-optical);
+      transition: width 0.3s;
+    }
+
+    .nav-link:hover::after, .nav-link.active::after {
+      width: 100%;
+    }
+
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .icon-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-glass);
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .icon-btn:hover {
+      background: var(--accent-optical);
+      color: #000;
+      border-color: var(--accent-optical);
+    }
+
+    /* Cinematic Intro Overlay */
+    #intro-overlay {
+      position: fixed;
+      inset: 0;
+      background: #000000;
+      z-index: 10000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 1s ease, visibility 1s ease;
+    }
+
+    #intro-overlay.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .intro-canvas-box {
+      position: relative;
+      width: 280px;
+      height: 280px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .intro-ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      animation: introSpin 12s linear infinite;
+    }
+
+    .intro-ring-1 { width: 260px; height: 260px; border-style: dashed; }
+    .intro-ring-2 { width: 190px; height: 190px; border-color: var(--accent-gold); animation-direction: reverse; animation-duration: 8s; }
+    .intro-ring-3 { width: 120px; height: 120px; border-width: 2px; }
+
+    @keyframes introSpin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .intro-text-box {
+      margin-top: 30px;
+      text-align: center;
+    }
+
+    .intro-title {
+      font-family: var(--font-heading);
+      font-size: 2.2rem;
+      letter-spacing: 8px;
+      margin-bottom: 8px;
+      color: #ffffff;
+    }
+
+    .intro-tagline {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      letter-spacing: 4px;
+      color: var(--accent-optical);
+      text-transform: uppercase;
+    }
+
+    .intro-progress-bar {
+      width: 200px;
+      height: 2px;
+      background: rgba(255,255,255,0.1);
+      margin: 24px auto;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .intro-progress-fill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 0%;
+      background: var(--accent-optical);
+      box-shadow: 0 0 10px var(--accent-optical);
+      transition: width 0.1s linear;
+    }
+
+    .skip-intro-btn {
+      position: absolute;
+      bottom: 40px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      color: var(--text-muted);
+      background: transparent;
+      border: 1px solid var(--border-glass);
+      padding: 8px 18px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .skip-intro-btn:hover {
+      color: var(--text-bright);
+      border-color: var(--accent-optical);
+    }
+
+    /* Main Container & Sections */
+    main {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+    }
+
+    section {
+      min-height: 100vh;
+      padding: 120px 8% 80px 8%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+    }
+
+    .section-header {
+      margin-bottom: 50px;
+    }
+
+    .section-tag {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      letter-spacing: 3px;
+      color: var(--accent-optical);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-tag::before {
+      content: '';
+      width: 12px;
+      height: 2px;
+      background: var(--accent-optical);
+    }
+
+    .section-title {
+      font-family: var(--font-heading);
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--text-bright);
+      line-height: 1.2;
+    }
+
+    .section-desc {
+      font-size: 1rem;
+      color: var(--text-muted);
+      max-width: 650px;
+      margin-top: 14px;
+      line-height: 1.6;
+    }
+
+    /* 02 — HERO SECTION */
+    #hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: 40px;
+      padding-top: 140px;
+    }
+
+    .hero-content {
+      z-index: 5;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: rgba(0, 240, 255, 0.06);
+      border: 1px solid var(--border-highlight);
+      border-radius: 30px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--accent-optical);
+      letter-spacing: 2px;
+      margin-bottom: 24px;
+    }
+
+    .hero-title {
+      font-family: var(--font-heading);
+      font-size: clamp(2.8rem, 5vw, 4.5rem);
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: 2px;
+      color: var(--text-bright);
+      margin-bottom: 20px;
+    }
+
+    .hero-title span {
+      background: linear-gradient(135deg, var(--text-bright), var(--accent-optical));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 18px;
+      margin-top: 36px;
+      flex-wrap: wrap;
+    }
+
+    .hero-visual-viewport {
+      position: relative;
+      width: 100%;
+      height: 480px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hero-lens-interactive {
+      width: 380px;
+      height: 380px;
+      border-radius: 50%;
+      position: relative;
+      background: radial-gradient(circle at 35% 35%, rgba(0, 240, 255, 0.15), rgba(0, 0, 0, 0.8));
+      box-shadow: inset 0 0 50px rgba(0, 240, 255, 0.3), 0 0 60px rgba(0, 0, 0, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.1s ease-out;
+    }
+
+    .hero-iris-ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px dashed var(--accent-optical);
+      animation: rotateLens 20s linear infinite;
+    }
+
+    .hero-iris-ring-1 { width: 340px; height: 340px; }
+    .hero-iris-ring-2 { width: 260px; height: 260px; border-style: solid; border-color: rgba(245, 158, 11, 0.5); animation-direction: reverse; }
+    .hero-iris-ring-3 { width: 180px; height: 180px; border-width: 2px; }
+
+    .hero-lens-core {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--accent-optical), #000);
+      box-shadow: 0 0 30px var(--accent-optical);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: #000;
+      font-weight: bold;
+    }
+
+    @keyframes rotateLens {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* 03 — INTERACTIVE OPTICAL LAB (SLIT LAMP & 3D MODELS) */
+    .lab-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 30px;
+      margin-top: 20px;
+    }
+
+    .lab-viewport-container {
+      height: 520px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .lab-canvas-box {
+      flex: 1;
+      width: 100%;
+      position: relative;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    #slitlamp-canvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    .lab-controls-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      background: var(--bg-glass-solid);
+      border-top: 1px solid var(--border-glass);
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .control-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .control-label {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .range-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100px;
+      height: 4px;
+      border-radius: 2px;
+      background: var(--border-glass);
+      outline: none;
+    }
+
+    .range-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--accent-optical);
+      cursor: pointer;
+      box-shadow: 0 0 8px var(--accent-optical);
+    }
+
+    .lab-info-panel {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .component-list {
+      list-style: none;
+      margin-top: 16px;
+    }
+
+    .component-item {
+      padding: 10px 14px;
+      margin-bottom: 8px;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid transparent;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .component-item:hover, .component-item.active {
+      background: rgba(0, 240, 255, 0.08);
+      border-color: var(--accent-optical);
+      color: var(--accent-optical);
+    }
+
+    .component-item .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--text-muted);
+    }
+
+    .component-item.active .dot {
+      background: var(--accent-optical);
+      box-shadow: 0 0 8px var(--accent-optical);
+    }
+
+    /* 04 — HUMAN EYE & LIGHT-TO-VISION LAB */
+    .eye-lab-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin-top: 20px;
+    }
+
+    .interactive-canvas-card {
+      height: 440px;
+      position: relative;
+    }
+
+    .canvas-overlay-hud {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--accent-optical);
+      background: rgba(0,0,0,0.6);
+      padding: 6px 12px;
+      border-radius: 4px;
+      border: 1px solid var(--border-glass);
+      pointer-events: none;
+    }
+
+    /* 05 — PRODUCT ARCHIVE SECTION */
+    .product-filter-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .view-mode-toggles {
+      display: flex;
+      gap: 8px;
+      background: rgba(0,0,0,0.3);
+      padding: 4px;
+      border-radius: 6px;
+      border: 1px solid var(--border-glass);
+    }
+
+    .view-btn {
+      padding: 6px 14px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .view-btn.active {
+      background: var(--accent-optical);
+      color: #000;
+      font-weight: bold;
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 24px;
+      transition: all 0.4s ease;
+    }
+
+    .products-grid.cinematic-view {
+      grid-template-columns: 1fr;
+    }
+
+    .product-card {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 380px;
+    }
+
+    .cinematic-view .product-card {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: 30px;
+      min-height: 320px;
+    }
+
+    .product-img-box {
+      width: 100%;
+      height: 200px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border-radius: 8px;
+      background: rgba(0,0,0,0.3);
+    }
+
+    .cinematic-view .product-img-box {
+      height: 280px;
+    }
+
+    .product-img-box img {
+      max-width: 90%;
+      max-height: 90%;
+      object-fit: contain;
+      transition: transform 0.5s var(--transition-smooth);
+    }
+
+    .product-card:hover .product-img-box img {
+      transform: scale(1.08);
+    }
+
+    .product-info {
+      margin-top: 16px;
+    }
+
+    .product-code {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--accent-optical);
+      letter-spacing: 2px;
+    }
+
+    .product-name {
+      font-family: var(--font-heading);
+      font-size: 1.2rem;
+      color: var(--text-bright);
+      margin: 6px 0 10px 0;
+    }
+
+    .product-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    /* 06 — PERSISTENT TECHNICAL HUD BAR */
+    #hud-persistent-bar {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 900;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 10px 24px;
+      background: var(--bg-glass-solid);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-glass);
+      border-radius: 40px;
+      box-shadow: var(--shadow-glass);
+    }
+
+    .hud-metric {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .hud-metric span {
+      color: var(--accent-optical);
+      font-weight: bold;
+    }
+
+    .hud-divider {
+      width: 1px;
+      height: 16px;
+      background: var(--border-glass);
+    }
+
+    /* 07 — CONTACT SECTION & FOOTER */
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      margin-top: 30px;
+    }
+
+    .contact-info-box {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .contact-detail-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .contact-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background: rgba(0, 240, 255, 0.08);
+      border: 1px solid var(--border-highlight);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-optical);
+      flex-shrink: 0;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+
+    .status-open {
+      background: rgba(34, 197, 94, 0.15);
+      color: #22c55e;
+      border: 1px solid rgba(34, 197, 94, 0.4);
+    }
+
+    .status-closed {
+      background: rgba(239, 68, 68, 0.15);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.4);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+    .status-open .status-dot { background: #22c55e; box-shadow: 0 0 8px #22c55e; }
+    .status-closed .status-dot { background: #ef4444; }
+
+    footer {
+      padding: 40px 8%;
+      border-top: 1px solid var(--border-glass);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      position: relative;
+      z-index: 10;
+      background: var(--bg-primary);
+    }
+
+    .developer-credit {
+      color: var(--accent-optical);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+
+    /* Modal Styling */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 2000;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      padding: 20px;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-container {
+      width: 100%;
+      max-width: 600px;
+      padding: 30px;
+      position: relative;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .modal-close:hover {
+      color: var(--accent-optical);
+    }
+
+    /* Mobile Responsive Adjustments */
+    @media (max-width: 992px) {
+      #hero { grid-template-columns: 1fr; padding-top: 100px; text-align: center; }
+      .hero-actions { justify-content: center; }
+      .lab-grid, .eye-lab-grid, .contact-grid { grid-template-columns: 1fr; }
+      header { padding: 15px 20px; }
+      nav { display: none; } /* Simplified mobile header */
+      section { padding: 80px 5% 60px 5%; }
+      #hud-persistent-bar { width: 90%; justify-content: space-around; padding: 8px 12px; }
+      .hud-metric:nth-child(even) { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background WebGL Canvas -->
+  <canvas id="bg-webgl-canvas"></canvas>
+  <div class="optical-grid-overlay"></div>
+
+  <!-- Custom Optical Cursor -->
+  <div id="optical-cursor"></div>
+
+  <!-- Cinematic Intro Overlay -->
+  <div id="intro-overlay">
+    <div class="intro-canvas-box">
+      <div class="intro-ring intro-ring-1"></div>
+      <div class="intro-ring intro-ring-2"></div>
+      <div class="intro-ring intro-ring-3"></div>
+      <svg width="60" height="60" viewBox="0 0 100 100" fill="none">
+        <circle cx="50" cy="50" r="45" stroke="#00f0ff" stroke-width="2" stroke-dasharray="6,6"/>
+        <circle cx="50" cy="50" r="20" fill="#00f0ff" fill-opacity="0.2" stroke="#00f0ff" stroke-width="2"/>
+        <circle cx="50" cy="50" r="8" fill="#00f0ff"/>
+      </svg>
+    </div>
+    <div class="intro-text-box">
+      <h1 class="intro-title">EYEKON</h1>
+      <p class="intro-tagline">Precision in Vision • 6D Optical Engine</p>
+      <div class="intro-progress-bar">
+        <div class="intro-progress-fill" id="intro-progress-fill"></div>
+      </div>
+    </div>
+    <button class="skip-intro-btn" id="skip-intro-btn">ENTER SYSTEM [ESC]</button>
+  </div>
+
+  <!-- Header Navigation -->
+  <header id="main-header">
+    <div class="brand-container" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+      <div class="brand-logo-ring">
+        <img src="eye.jpg" alt="Eyekon Logo" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\' fill=\'%2300f0ff\'><circle cx=\'50\' cy=\'50\' r=\'40\' fill=\'none\' stroke=\'%2300f0ff\' stroke-width=\'8\'/><circle cx=\'50\' cy=\'50\' r=\'18\'/></svg>'">
+      </div>
+      <div>
+        <div class="brand-title">EYEKON</div>
+        <div class="brand-subtitle">Precision in Vision</div>
+      </div>
+    </div>
+
+    <nav>
+      <a href="#hero" class="nav-link active">Experience</a>
+      <a href="#optical-lab" class="nav-link">Optical Lab</a>
+      <a href="#eye-lab" class="nav-link">Anatomy</a>
+      <a href="#products" class="nav-link">Products</a>
+      <a href="#contact" class="nav-link">Contact</a>
+    </nav>
+
+    <div class="nav-controls">
+      <!-- Theme Toggle -->
+      <button class="icon-btn" id="theme-toggle" title="Toggle Theme (Obsidian / Clinical Light)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"/>
+          <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        </svg>
+      </button>
+
+      <!-- Visual Mode Toggle -->
+      <button class="icon-btn" id="mode-toggle" title="Cycle Visual Mode (Cinematic / Technical / Minimal)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+          <line x1="3" y1="9" x2="21" y2="9"/>
+          <line x1="9" y1="21" x2="9" y2="9"/>
+        </svg>
+      </button>
+
+      <!-- Sign-In Modal Trigger -->
+      <button class="btn-optical btn-secondary" id="auth-btn">
+        <span>ACCOUNT</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+
+    <!-- 01 — HERO SECTION -->
+    <section id="hero">
+      <div class="hero-content">
+        <div class="hero-badge">
+          <span style="width:6px; height:6px; border-radius:50%; background:var(--accent-optical); display:inline-block;"></span>
+          6D OPTICAL EXPERIENCE ENGINE
+        </div>
+        <h1 class="hero-title">PRECISION IN <span>VISION</span></h1>
+        <p class="section-desc">
+          Step inside a living optical instrument. EYEKON unites spatial geometry, temporal progression, controlled illumination, interactive dynamics, contextual information, and adaptive perspective.
+        </p>
+        <div class="hero-actions">
+          <a href="#optical-lab" class="btn-optical">ENTER OPTICAL LAB</a>
+          <a href="#products" class="btn-optical btn-secondary">VIEW CATALOGUE</a>
+        </div>
+      </div>
+
+      <div class="hero-visual-viewport">
+        <div class="hero-lens-interactive" id="hero-interactive-lens">
+          <div class="hero-iris-ring hero-iris-ring-1"></div>
+          <div class="hero-iris-ring hero-iris-ring-2"></div>
+          <div class="hero-iris-ring hero-iris-ring-3"></div>
+          <div class="hero-lens-core">4D/6D</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 02 — INTERACTIVE OPTICAL LAB (SLIT LAMP & MAGNIFICATION) -->
+    <section id="optical-lab">
+      <div class="section-header">
+        <div class="section-tag">SIMULATION & LABORATORY</div>
+        <h2 class="section-title">VIRTUAL SLIT LAMP & OPTICAL LAB</h2>
+        <p class="section-desc">
+          Inspect precision ophthalmic instrumentation in real time. Manipulate slit beam parameters, magnification factors, and spatial component layouts.
+        </p>
+      </div>
+
+      <div class="lab-grid">
+        <div class="glass-card lab-viewport-container">
+          <div class="lab-canvas-box">
+            <canvas id="slitlamp-canvas"></canvas>
+            <div class="canvas-overlay-hud">MODE: 3D INSPECTION • 360° INTERACTIVE</div>
+          </div>
+          <div class="lab-controls-bar">
+            <div class="control-group">
+              <span class="control-label">MAGNIFICATION:</span>
+              <button class="btn-optical btn-secondary" onclick="setLabMag('1x')" style="padding:4px 10px; font-size:0.7rem;">1X</button>
+              <button class="btn-optical btn-secondary" onclick="setLabMag('2x')" style="padding:4px 10px; font-size:0.7rem;">2X</button>
+              <button class="btn-optical btn-secondary" onclick="setLabMag('5x')" style="padding:4px 10px; font-size:0.7rem;">5X</button>
+            </div>
+            <div class="control-group">
+              <span class="control-label">SLIT INTENSITY:</span>
+              <input type="range" class="range-slider" id="slit-intensity" min="0" max="100" value="70">
+            </div>
+            <div class="control-group">
+              <button class="btn-optical" id="reset-lab-cam-btn" style="padding:6px 14px; font-size:0.75rem;">RESET VIEW</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card lab-info-panel">
+          <div>
+            <h3 style="font-family:var(--font-heading); color:var(--text-bright); margin-bottom:8px;">COMPONENT INSPECTION</h3>
+            <p style="font-size:0.8rem; color:var(--text-muted);">Select a structural subsystem to isolate and inspect focal geometry.</p>
+            <ul class="component-list" id="lab-component-list">
+              <li class="component-item active" data-target="microscope">
+                <span>MICROSCOPE & EYEPIECES</span>
+                <span class="dot"></span>
+              </li>
+              <li class="component-item" data-target="illumination">
+                <span>ILLUMINATION TOWER & SLIT</span>
+                <span class="dot"></span>
+              </li>
+              <li class="component-item" data-target="joystick">
+                <span>PRECISION JOYSTICK BASE</span>
+                <span class="dot"></span>
+              </li>
+              <li class="component-item" data-target="chinrest">
+                <span>PATIENT CHIN REST ASSEMBLY</span>
+                <span class="dot"></span>
+              </li>
+            </ul>
+          </div>
+          <div style="border-top:1px solid var(--border-glass); padding-top:16px; margin-top:16px;">
+            <div style="font-family:var(--font-mono); font-size:0.7rem; color:var(--accent-gold);">
+              * EDUCATIONAL VISUALIZATION — ILLUSTRATIVE SIMULATION
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 — ANATOMY & LIGHT-TO-VISION LAB -->
+    <section id="eye-lab">
+      <div class="section-header">
+        <div class="section-tag">OPHTHALMIC ANATOMY</div>
+        <h2 class="section-title">HUMAN EYE & LIGHT PATHWAY</h2>
+        <p class="section-desc">
+          Explore ocular structure and track photonic propagation through the optical media to neural translation.
+        </p>
+      </div>
+
+      <div class="eye-lab-grid">
+        <!-- Ocular Visualizer -->
+        <div class="glass-card interactive-canvas-card">
+          <div class="canvas-overlay-hud">ANATOMICAL SCHEMATIC MODEL</div>
+          <canvas id="eye-anatomy-canvas" style="width:100%; height:100%;"></canvas>
+          <div style="position:absolute; bottom:16px; left:16px; right:16px; display:flex; justify-content:space-between; gap:10px;">
+            <button class="btn-optical btn-secondary" onclick="toggleEyeCutaway()" style="padding:6px 12px; font-size:0.7rem;">TOGGLE CUTAWAY</button>
+            <button class="btn-optical btn-secondary" onclick="toggleEyeTransparency()" style="padding:6px 12px; font-size:0.7rem;">TRANSPARENCY MODE</button>
+          </div>
+        </div>
+
+        <!-- Light to Vision Propagation -->
+        <div class="glass-card interactive-canvas-card" style="display:flex; flex-direction:column; justify-content:space-between; padding:20px;">
+          <div>
+            <div class="section-tag" style="margin-bottom:4px;">PHOTONIC SIMULATION</div>
+            <h3 style="font-family:var(--font-heading); color:var(--text-bright);">LIGHT → VISION PATHWAY</h3>
+            <p style="font-size:0.8rem; color:var(--text-muted); margin-top:6px;">Sequence: Light Ray → Cornea → Pupil → Lens → Retina → Optic Nerve → Brain</p>
+          </div>
+
+          <div style="height:200px; width:100%; position:relative;">
+            <canvas id="light-path-canvas" style="width:100%; height:100%;"></canvas>
+          </div>
+
+          <div style="display:flex; align-items:center; justify-content:space-between; border-top:1px solid var(--border-glass); padding-top:12px;">
+            <div style="display:flex; gap:8px;">
+              <button class="btn-optical" id="play-light-sim" style="padding:6px 14px; font-size:0.75rem;">PLAY</button>
+              <button class="btn-optical btn-secondary" id="pause-light-sim" style="padding:6px 14px; font-size:0.75rem;">PAUSE</button>
+            </div>
+            <div id="light-stage-hud" style="font-family:var(--font-mono); font-size:0.75rem; color:var(--accent-optical);">STAGE 1: CORNEA</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 04 — PRODUCT ARCHIVE -->
+    <section id="products">
+      <div class="section-header">
+        <div class="section-tag">OPHTHALMIC INSTRUMENTATION</div>
+        <h2 class="section-title">PRODUCT ARCHIVE</h2>
+        <p class="section-desc">
+          Precision instruments engineered for diagnostic accuracy and clinical efficiency.
+        </p>
+      </div>
+
+      <div class="product-filter-bar">
+        <div style="font-family:var(--font-mono); font-size:0.8rem; color:var(--text-muted);">
+          SHOWING ALL <span style="color:var(--accent-optical); font-weight:bold;">10</span> INSTRUMENTS
+        </div>
+        <div class="view-mode-toggles">
+          <button class="view-btn active" id="view-grid-btn">GRID VIEW</button>
+          <button class="view-btn" id="view-cinematic-btn">CINEMATIC VIEW</button>
+        </div>
+      </div>
+
+      <div class="products-grid" id="products-container">
+        <!-- Rendered dynamically via JavaScript -->
+      </div>
+    </section>
+
+    <!-- 05 — CONTACT SECTION -->
+    <section id="contact">
+      <div class="section-header">
+        <div class="section-tag">CONNECT & LOCATION</div>
+        <h2 class="section-title">CONTACT EYEKON</h2>
+        <p class="section-desc">Precision begins with connection. Reach out for consultations, inquiries, or official catalog requests.</p>
+      </div>
+
+      <div class="contact-grid">
+        <div class="glass-card" style="padding:30px;">
+          <h3 style="font-family:var(--font-heading); font-size:1.4rem; color:var(--text-bright); margin-bottom:20px;">HEADQUARTERS & CLINICAL SHOWROOM</h3>
+          
+          <div class="contact-info-box">
+            <div class="contact-detail-item">
+              <div class="contact-icon">📍</div>
+              <div>
+                <div style="font-family:var(--font-mono); font-size:0.75rem; color:var(--text-muted);">LOCATION ADDRESS</div>
+                <div style="color:var(--text-bright); font-size:0.9rem; margin-top:4px; line-height:1.5;">
+                  M-D1, Sector B, Kanpur Rd, LDA Colony,<br>
+                  opposite Kisna Diamond & Gold Jewellery,<br>
+                  Alambagh, Lucknow, Uttar Pradesh 226012
+                </div>
+              </div>
+            </div>
+
+            <div class="contact-detail-item">
+              <div class="contact-icon">🕒</div>
+              <div>
+                <div style="font-family:var(--font-mono); font-size:0.75rem; color:var(--text-muted);">OPERATING HOURS & LIVE STATUS</div>
+                <div style="display:flex; align-items:center; gap:12px; margin-top:6px;">
+                  <span style="color:var(--text-bright); font-size:0.9rem;">OPEN DAILY · 10:00 AM — 5:00 PM</span>
+                  <div id="live-status-indicator" class="status-badge status-open">
+                    <span class="status-dot"></span> CALCULATING...
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="contact-detail-item">
+              <div class="contact-icon">📞</div>
+              <div>
+                <div style="font-family:var(--font-mono); font-size:0.75rem; color:var(--text-muted);">DIRECT PHONE / WHATSAPP</div>
+                <div style="color:var(--text-bright); font-size:1.1rem; font-family:var(--font-mono); margin-top:4px;">
+                  +91 9455855203
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card" style="padding:30px; display:flex; flex-direction:column; justify-content:space-between;">
+          <div>
+            <h3 style="font-family:var(--font-heading); font-size:1.4rem; color:var(--text-bright); margin-bottom:12px;">DIRECT INQUIRY PORTAL</h3>
+            <p style="font-size:0.85rem; color:var(--text-muted); line-height:1.6;">
+              Select a preferred action below to open a verified communication link with EYEKON vision representatives.
+            </p>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:12px; margin-top:24px;">
+            <a href="https://wa.me/919455855203?text=Message%20Eyekon%20Vision%20on%20WhatsApp." target="_blank" class="btn-optical" style="justify-content:center;">
+              MESSAGE EYEKON ON WHATSAPP
+            </a>
+            <a href="https://wa.me/c/919455855203" target="_blank" class="btn-optical btn-secondary" style="justify-content:center;">
+              VIEW OFFICIAL CATALOGUE
+            </a>
+            <a href="tel:9455855203" class="btn-optical btn-secondary" style="justify-content:center;">
+              CALL +91 9455855203
+            </a>
+            <a href="https://maps.app.goo.gl/77szJmgtXu7oERWr8" target="_blank" class="btn-optical btn-secondary" style="justify-content:center;">
+              GET DIRECTIONS ON GOOGLE MAPS
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Persistent Technical HUD Bar -->
+  <div id="hud-persistent-bar">
+    <div class="hud-metric">EYEKON / <span>6D ENGINE</span></div>
+    <div class="hud-divider"></div>
+    <div class="hud-metric">MODE: <span id="hud-mode-val">CINEMATIC</span></div>
+    <div class="hud-divider"></div>
+    <div class="hud-metric">MAG: <span id="hud-mag-val">1.0X</span></div>
+    <div class="hud-divider"></div>
+    <div class="hud-metric">FPS: <span id="hud-fps-val">60</span></div>
+    <div class="hud-divider"></div>
+    <div class="hud-metric">STATUS: <span style="color:#22c55e;">READY</span></div>
+  </div>
+
+  <!-- Sign In / Auth Modal -->
+  <div class="modal-overlay" id="auth-modal">
+    <div class="glass-card modal-container">
+      <button class="modal-close" onclick="closeAuthModal()">✕</button>
+      <h3 style="font-family:var(--font-heading); font-size:1.5rem; color:var(--text-bright); margin-bottom:8px;">ACCOUNT ACCESS</h3>
+      <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:24px;">Sign in to save your custom visual preferences and laboratory setups.</p>
+      
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        <button class="btn-optical" style="background:#fff; color:#000; border-color:#fff;" onclick="alert('Google Authentication setup requires OAuth configuration.')">
+          <svg width="18" height="18" viewBox="0 0 24 24" style="margin-right:8px;"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+          CONTINUE WITH GOOGLE
+        </button>
+        <button class="btn-optical btn-secondary" onclick="closeAuthModal()">
+          CONTINUE AS GUEST
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div>© 2026 EYEKON VISION. ALL RIGHTS RESERVED.</div>
+    <div class="developer-credit">DIGITAL EXPERIENCE BY SHAURYA MITTAL</div>
+  </footer>
+
+  <!-- ==========================================================================
+       02 — ENGINE CORE JAVASCRIPT & THREE.JS LOGIC
+       ========================================================================== -->
+  <script>
+    /* --------------------------------------------------------------------------
+       A. STATE MANAGEMENT & GLOBALS
+       -------------------------------------------------------------------------- */
+    const STATE = {
+      theme: localStorage.getItem('eyekon_theme') || 'obsidian',
+      mode: localStorage.getItem('eyekon_mode') || 'cinematic',
+      magnification: 1.0,
+      fps: 60,
+      activeComponent: 'microscope'
+    };
+
+    // Apply saved initial theme/mode
+    document.documentElement.setAttribute('data-theme', STATE.theme);
+    document.documentElement.setAttribute('data-mode', STATE.mode);
+
+    /* --------------------------------------------------------------------------
+       B. INTRO ANIMATION & PROGRESS ENGINE
+       -------------------------------------------------------------------------- */
+    let introProgress = 0;
+    const progressFill = document.getElementById('intro-progress-fill');
+    const introOverlay = document.getElementById('intro-overlay');
+
+    const introInterval = setInterval(() => {
+      introProgress += 2;
+      if (progressFill) progressFill.style.width = introProgress + '%';
+      if (introProgress >= 100) {
+        clearInterval(introInterval);
+        hideIntro();
+      }
+    }, 30);
+
+    function hideIntro() {
+      if (introOverlay) introOverlay.classList.add('hidden');
+    }
+
+    document.getElementById('skip-intro-btn')?.addEventListener('click', hideIntro);
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') hideIntro();
+    });
+
+    /* --------------------------------------------------------------------------
+       C. CUSTOM OPTICAL CURSOR
+       -------------------------------------------------------------------------- */
+    const cursor = document.getElementById('optical-cursor');
+    let mouseX = window.innerWidth / 2;
+    let mouseY = window.innerHeight / 2;
+
+    window.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      if (cursor) {
+        cursor.style.left = mouseX + 'px';
+        cursor.style.top = mouseY + 'px';
+      }
+    });
+
+    document.querySelectorAll('button, a, .glass-card, .component-item').forEach(el => {
+      el.addEventListener('mouseenter', () => cursor?.classList.add('hovering'));
+      el.addEventListener('mouseleave', () => cursor?.classList.remove('hovering'));
+    });
+
+    /* --------------------------------------------------------------------------
+       D. THEME & MODE TOGGLES
+       -------------------------------------------------------------------------- */
+    const themeBtn = document.getElementById('theme-toggle');
+    themeBtn?.addEventListener('click', () => {
+      STATE.theme = STATE.theme === 'obsidian' ? 'clinical-light' : 'obsidian';
+      document.documentElement.setAttribute('data-theme', STATE.theme);
+      localStorage.setItem('eyekon_theme', STATE.theme);
+    });
+
+    const modeBtn = document.getElementById('mode-toggle');
+    const modes = ['cinematic', 'technical', 'minimal'];
+    modeBtn?.addEventListener('click', () => {
+      let idx = (modes.indexOf(STATE.mode) + 1) % modes.length;
+      STATE.mode = modes[idx];
+      document.documentElement.setAttribute('data-mode', STATE.mode);
+      localStorage.setItem('eyekon_mode', STATE.mode);
+      document.getElementById('hud-mode-val').innerText = STATE.mode.toUpperCase();
+    });
+
+    /* --------------------------------------------------------------------------
+       E. THREE.JS BACKGROUND 4D ENVIRONMENT
+       -------------------------------------------------------------------------- */
+    const bgCanvas = document.getElementById('bg-webgl-canvas');
+    const bgScene = new THREE.Scene();
+    const bgCamera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const bgRenderer = new THREE.WebGLRenderer({ canvas: bgCanvas, alpha: true, antialias: true });
+
+    bgRenderer.setSize(window.innerWidth, window.innerHeight);
+    bgRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    // Particle Swarm
+    const particleCount = 400;
+    const geometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(particleCount * 3);
+
+    for (let i = 0; i < particleCount * 3; i += 3) {
+      positions[i] = (Math.random() - 0.5) * 40;
+      positions[i + 1] = (Math.random() - 0.5) * 40;
+      positions[i + 2] = (Math.random() - 0.5) * 40;
+    }
+
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    const material = new THREE.PointsMaterial({
+      color: 0x00f0ff,
+      size: 0.15,
+      transparent: true,
+      opacity: 0.6
+    });
+
+    const particleSystem = new THREE.Points(geometry, material);
+    bgScene.add(particleSystem);
+    bgCamera.position.z = 20;
+
+    /* --------------------------------------------------------------------------
+       F. THREE.JS VIRTUAL SLIT LAMP LAB
+       -------------------------------------------------------------------------- */
+    const slitCanvas = document.getElementById('slitlamp-canvas');
+    const slitScene = new THREE.Scene();
+    const slitCamera = new THREE.PerspectiveCamera(45, slitCanvas?.clientWidth / slitCanvas?.clientHeight || 1, 0.1, 100);
+    const slitRenderer = new THREE.WebGLRenderer({ canvas: slitCanvas, alpha: true, antialias: true });
+
+    if (slitCanvas) {
+      slitRenderer.setSize(slitCanvas.clientWidth, slitCanvas.clientHeight);
+      slitRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    }
+
+    // Abstract Slit Lamp Instrumentation Geometry
+    const labGroup = new THREE.Group();
+
+    // Base
+    const baseGeo = new THREE.CylinderGeometry(3, 3.5, 0.5, 32);
+    const metalMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.3, metalness: 0.8 });
+    const baseMesh = new THREE.Mesh(baseGeo, metalMat);
+    labGroup.add(baseMesh);
+
+    // Pillar / Tower
+    const pillarGeo = new THREE.CylinderGeometry(0.4, 0.4, 5, 16);
+    const pillarMesh = new THREE.Mesh(pillarGeo, metalMat);
+    pillarMesh.position.y = 2.5;
+    labGroup.add(pillarMesh);
+
+    // Optical Microscope Head
+    const headGeo = new THREE.BoxGeometry(1.8, 1.2, 2.2);
+    const glassMat = new THREE.MeshPhysicalMaterial({ color: 0x00f0ff, roughness: 0.1, transmission: 0.9, thickness: 1.2 });
+    const headMesh = new THREE.Mesh(headGeo, glassMat);
+    headMesh.position.set(0, 4.5, 0.5);
+    labGroup.add(headMesh);
+
+    slitScene.add(labGroup);
+
+    // Lights
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    slitScene.add(ambientLight);
+
+    const dirLight = new THREE.DirectionalLight(0x00f0ff, 1.5);
+    dirLight.position.set(5, 10, 7);
+    slitScene.add(dirLight);
+
+    slitCamera.position.set(6, 6, 10);
+    slitCamera.lookAt(0, 2.5, 0);
+
+    /* --------------------------------------------------------------------------
+       G. ANIMATION LOOP
+       -------------------------------------------------------------------------- */
+    let lastTime = performance.now();
+    let frameCount = 0;
+
+    function animate() {
+      requestAnimationFrame(animate);
+
+      // Background particle drift
+      particleSystem.rotation.y += 0.001;
+      particleSystem.rotation.x += 0.0005;
+
+      // Parallax effect from cursor
+      bgCamera.position.x += ((mouseX / window.innerWidth - 0.5) * 2 - bgCamera.position.x) * 0.05;
+      bgCamera.position.y += (-(mouseY / window.innerHeight - 0.5) * 2 - bgCamera.position.y) * 0.05;
+
+      bgRenderer.render(bgScene, bgCamera);
+
+      // Slit Lamp rotation
+      labGroup.rotation.y += 0.005;
+      if (slitCanvas && slitCanvas.clientWidth > 0) {
+        slitRenderer.render(slitScene, slitCamera);
+      }
+
+      // FPS Calculation
+      frameCount++;
+      const now = performance.now();
+      if (now - lastTime >= 1000) {
+        STATE.fps = frameCount;
+        document.getElementById('hud-fps-val').innerText = STATE.fps;
+        frameCount = 0;
+        lastTime = now;
+      }
+    }
+
+    animate();
+
+    window.addEventListener('resize', () => {
+      bgCamera.aspect = window.innerWidth / window.innerHeight;
+      bgCamera.updateProjectionMatrix();
+      bgRenderer.setSize(window.innerWidth, window.innerHeight);
+
+      if (slitCanvas) {
+        slitCamera.aspect = slitCanvas.clientWidth / slitCanvas.clientHeight;
+        slitCamera.updateProjectionMatrix();
+        slitRenderer.setSize(slitCanvas.clientWidth, slitCanvas.clientHeight);
+      }
+    });
+
+    /* --------------------------------------------------------------------------
+       H. LAB MAGNIFICATION & CONTROLS
+       -------------------------------------------------------------------------- */
+    window.setLabMag = function(magStr) {
+      document.getElementById('hud-mag-val').innerText = magStr.toUpperCase();
+      if (magStr === '1x') slitCamera.position.set(6, 6, 10);
+      if (magStr === '2x') slitCamera.position.set(4, 4, 7);
+      if (magStr === '5x') slitCamera.position.set(2, 3, 4);
+    };
+
+    document.getElementById('reset-lab-cam-btn')?.addEventListener('click', () => setLabMag('1x'));
+
+    // Component Selection
+    document.querySelectorAll('#lab-component-list .component-item').forEach(item => {
+      item.addEventListener('click', function() {
+        document.querySelectorAll('#lab-component-list .component-item').forEach(i => i.classList.remove('active'));
+        this.classList.add('active');
+        const target = this.getAttribute('data-target');
+        STATE.activeComponent = target;
+
+        if (target === 'microscope') slitCamera.position.set(0, 4.5, 4);
+        if (target === 'illumination') slitCamera.position.set(3, 4, 3);
+        if (target === 'joystick') slitCamera.position.set(0, 1, 5);
+        if (target === 'chinrest') slitCamera.position.set(0, 2.5, 4);
+      });
+    });
+
+    /* --------------------------------------------------------------------------
+       I. ANATOMY CANVASES & LIGHT PATHWAY SIMULATOR
+       -------------------------------------------------------------------------- */
+    // Eye Anatomy 2D Visualizer
+    const eyeCanvas = document.getElementById('eye-anatomy-canvas');
+    if (eyeCanvas) {
+      const ctx = eyeCanvas.getContext('2d');
+      function drawEyeAnatomy() {
+        eyeCanvas.width = eyeCanvas.clientWidth;
+        eyeCanvas.height = eyeCanvas.clientHeight;
+        const cx = eyeCanvas.width / 2;
+        const cy = eyeCanvas.height / 2;
+
+        ctx.clearRect(0, 0, eyeCanvas.width, eyeCanvas.height);
+
+        // Outer Sclera
+        ctx.beginPath();
+        ctx.arc(cx, cy, 90, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+        ctx.lineWidth = 4;
+        ctx.stroke();
+
+        // Cornea Lens
+        ctx.beginPath();
+        ctx.arc(cx - 30, cy, 60, -Math.PI / 3, Math.PI / 3);
+        ctx.strokeStyle = '#00f0ff';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        // Iris
+        ctx.fillStyle = 'rgba(0, 240, 255, 0.4)';
+        ctx.fillRect(cx - 20, cy - 50, 8, 30);
+        ctx.fillRect(cx - 20, cy + 20, 8, 30);
+
+        // Pupil / Core
+        ctx.beginPath();
+        ctx.arc(cx, cy, 35, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0, 240, 255, 0.1)';
+        ctx.fill();
+        ctx.strokeStyle = '#00f0ff';
+        ctx.stroke();
+      }
+      drawEyeAnatomy();
+      window.addEventListener('resize', drawEyeAnatomy);
+    }
+
+    // Light Pathway Simulator
+    const lightCanvas = document.getElementById('light-path-canvas');
+    if (lightCanvas) {
+      const lctx = lightCanvas.getContext('2d');
+      let xPos = 0;
+      let simRunning = true;
+
+      function renderLightSim() {
+        lightCanvas.width = lightCanvas.clientWidth;
+        lightCanvas.height = lightCanvas.clientHeight;
+        lctx.clearRect(0, 0, lightCanvas.width, lightCanvas.height);
+
+        const cy = lightCanvas.height / 2;
+
+        // Draw Optical Beam
+        lctx.beginPath();
+        lctx.moveTo(0, cy);
+        lctx.lineTo(xPos, cy);
+        lctx.strokeStyle = '#00f0ff';
+        lctx.lineWidth = 4;
+        lctx.shadowBlur = 12;
+        lctx.shadowColor = '#00f0ff';
+        lctx.stroke();
+
+        if (simRunning) {
+          xPos += 3;
+          if (xPos > lightCanvas.width) xPos = 0;
+        }
+
+        // Stage Indicator
+        const stageHud = document.getElementById('light-stage-hud');
+        if (stageHud) {
+          const ratio = xPos / lightCanvas.width;
+          if (ratio < 0.2) stageHud.innerText = 'STAGE 1: CORNEA REFRACTION';
+          else if (ratio < 0.4) stageHud.innerText = 'STAGE 2: PUPIL APERTURE';
+          else if (ratio < 0.6) stageHud.innerText = 'STAGE 3: LENS FOCUSING';
+          else if (ratio < 0.8) stageHud.innerText = 'STAGE 4: RETINAL RECEPTION';
+          else stageHud.innerText = 'STAGE 5: OPTIC NERVE TRANSLATION';
+        }
+
+        requestAnimationFrame(renderLightSim);
+      }
+
+      renderLightSim();
+
+      document.getElementById('play-light-sim')?.addEventListener('click', () => simRunning = true);
+      document.getElementById('pause-light-sim')?.addEventListener('click', () => simRunning = false);
+    }
+
+    /* --------------------------------------------------------------------------
+       J. PRODUCT ARCHIVE ENGINE (10 PRODUCTS)
+       -------------------------------------------------------------------------- */
+    const productsContainer = document.getElementById('products-container');
+
+    const products = Array.from({ length: 10 }, (_, i) => ({
+      id: i + 1,
+      code: `PRODUCT 0${i + 1}`,
+      name: `EYEKON Precision Unit 0${i + 1}`,
+      img: `${i + 1}.jpg`
+    }));
+
+    function renderProducts(isCinematic = false) {
+      if (!productsContainer) return;
+      productsContainer.className = `products-grid ${isCinematic ? 'cinematic-view' : ''}`;
+      
+      productsContainer.innerHTML = products.map(p => `
+        <div class="glass-card product-card">
+          <div class="product-img-box">
+            <img src="${p.img}" alt="${p.name}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 200 200\' fill=\'none\'><rect width=\'200\' height=\'200\' fill=\'%23090d14\'/><circle cx=\'100\' cy=\'100\' r=\'60\' stroke=\'%2300f0ff\' stroke-width=\'2\'/><path d=\'M70 100 L130 100 M100 70 L100 130\' stroke=\'%2300f0ff\' stroke-width=\'1.5\'/><text x=\'100\' y=\'170\' fill=\'%2394a3b8\' font-family=\'monospace\' font-size=\'12\' text-anchor=\'middle\'>${p.code}</text></svg>'">
+          </div>
+          <div class="product-info">
+            <div class="product-code">${p.code}</div>
+            <h3 class="product-name">${p.name}</h3>
+            <p style="font-size:0.8rem; color:var(--text-muted);">High-precision diagnostic optical assembly.</p>
+            <div class="product-actions">
+              <a href="https://wa.me/919455855203?text=Hello%20EYEKON,%20I%20am%20interested%20in%20${encodeURIComponent(p.name)}." target="_blank" class="btn-optical" style="flex:1; padding:8px; font-size:0.75rem;">
+                INQUIRE ON WHATSAPP
+              </a>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    renderProducts(false);
+
+    document.getElementById('view-grid-btn')?.addEventListener('click', function() {
+      document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      renderProducts(false);
+    });
+
+    document.getElementById('view-cinematic-btn')?.addEventListener('click', function() {
+      document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      renderProducts(true);
+    });
+
+    /* --------------------------------------------------------------------------
+       K. AUTH MODAL ENGINE
+       -------------------------------------------------------------------------- */
+    const authBtn = document.getElementById('auth-btn');
+    const authModal = document.getElementById('auth-modal');
+
+    authBtn?.addEventListener('click', () => authModal?.classList.add('active'));
+    window.closeAuthModal = function() {
+      authModal?.classList.remove('active');
+    };
+
+    /* --------------------------------------------------------------------------
+       L. ASIA/KOLKATA TIME & LIVE STATUS ENGINE
+       -------------------------------------------------------------------------- */
+    function updateLiveStatus() {
+      const now = new Date();
+      const options = { timeZone: 'Asia/Kolkata', hour: 'numeric', minute: 'numeric', hour12: false };
+      const formatter = new Intl.DateTimeFormat([], options);
+      const parts = formatter.formatToParts(now);
+
+      let hour = 0, minute = 0;
+      parts.forEach(p => {
+        if (p.type === 'hour') hour = parseInt(p.value, 10);
+        if (p.type === 'minute') minute = parseInt(p.value, 10);
+      });
+
+      const currentMins = hour * 60 + minute;
+      // Operating hours: 10:00 AM (600 mins) to 5:00 PM (1020 mins)
+      const isOpen = currentMins >= 600 && currentMins < 1020;
+
+      const statusEl = document.getElementById('live-status-indicator');
+      if (statusEl) {
+        if (isOpen) {
+          statusEl.className = 'status-badge status-open';
+          statusEl.innerHTML = '<span class="status-dot"></span> OPEN NOW';
+        } else {
+          statusEl.className = 'status-badge status-closed';
+          statusEl.innerHTML = '<span class="status-dot"></span> CLOSED';
+        }
+      }
+    }
+
+    updateLiveStatus();
+    setInterval(updateLiveStatus, 60000);
+
+    /* --------------------------------------------------------------------------
+       M. HEADER SCROLL EFFECT
+       -------------------------------------------------------------------------- */
+    const header = document.getElementById('main-header');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) {
+        header?.classList.add('scrolled');
+      } else {
+        header?.classList.remove('scrolled');
+      }
+    });
+  </script>
+</body>
+</html>
